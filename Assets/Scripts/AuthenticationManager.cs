@@ -11,7 +11,7 @@ using System.Net;
 public class AuthenticationManager : MonoBehaviour
 {
    // the AWS region of where your services live
-   public static Amazon.RegionEndpoint Region = Amazon.RegionEndpoint.USEast1;
+   public static Amazon.RegionEndpoint Region = Amazon.RegionEndpoint.APNortheast1;
 
    // In production, should probably keep these in a config file
    const string IdentityPool = "YOUR_IDENTITY_POOL_ID"; //insert your Cognito User Pool ID, found under General Settings
@@ -98,12 +98,17 @@ public class AuthenticationManager : MonoBehaviour
 
    public async Task<bool> Login(string email, string password)
    {
-      // Debug.Log("Login: " + email + ", " + password);
+       Debug.Log("Login: " + email + ", " + password);
 
       CognitoUserPool userPool = new CognitoUserPool(userPoolId, AppClientID, _provider);
       CognitoUser user = new CognitoUser(email, AppClientID, userPool, _provider);
 
-      InitiateSrpAuthRequest authRequest = new InitiateSrpAuthRequest()
+        Debug.Log("userPool: " + userPoolId );
+        Debug.Log("AppClientID: " + AppClientID);
+        Debug.Log("user: " + user);
+        Debug.Log("userPool: " + userPool);
+
+        InitiateSrpAuthRequest authRequest = new InitiateSrpAuthRequest()
       {
          Password = password
       };
@@ -113,7 +118,7 @@ public class AuthenticationManager : MonoBehaviour
          AuthFlowResponse authFlowResponse = await user.StartWithSrpAuthAsync(authRequest).ConfigureAwait(false);
 
          _userid = await GetUserIdFromProvider(authFlowResponse.AuthenticationResult.AccessToken);
-         // Debug.Log("Users unique ID from cognito: " + _userid);
+         Debug.Log("Users unique ID from cognito: " + _userid);
 
          UserSessionCache userSessionCache = new UserSessionCache(
             authFlowResponse.AuthenticationResult.IdToken,
